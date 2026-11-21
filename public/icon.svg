@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="96" fill="#0f172a"/>
-  <rect x="44" y="44" width="424" height="424" rx="72" fill="#0f172a" stroke="#0088FF" stroke-width="16"/>
-  <text x="256" y="295" font-family="Arial, Helvetica, sans-serif" font-size="188" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="-4">BA</text>
-  <rect x="136" y="346" width="240" height="14" rx="7" fill="#0088FF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <rect width="512" height="512" rx="112" fill="#0F172A"/>
+  <!-- Minimal Iconic Geometric Banner / Wing Mark (Zero Text) -->
+  <path d="M144 136C144 122.745 154.745 112 168 112H296C344.601 112 384 151.399 384 200C384 234.185 364.521 263.82 336.046 278.458L216 340.154V400C216 413.255 205.255 424 192 424H168C154.745 424 144 413.255 144 400V136Z" fill="#0088FF"/>
+  <path d="M216 184H284C303.882 184 320 200.118 320 220C320 233.916 312.104 245.987 300.542 251.992L216 295.923V184Z" fill="#0F172A"/>
+  <path d="M252 332L356.485 278.297C367.854 272.453 381.428 280.708 381.428 293.492V392C381.428 409.673 367.101 424 349.428 424H284L252 332Z" fill="#FFFFFF"/>
 </svg>

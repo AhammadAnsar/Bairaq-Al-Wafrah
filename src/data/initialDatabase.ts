@@ -10,7 +10,7 @@ import {
 
 export const INITIAL_WORKSPACE_DB: WorkspaceDatabase = {
   version: 2,
-  organizationName: 'Bairaq Al-Wafrah General Trading Company',
+  organizationName: 'Bairaq Al-Wafrah',
   ownerEmail: 'ansarahammad369@gmail.com',
   operatorProfile: {
     fullName: 'Ansar Ahammad',

@@ -49,13 +49,13 @@ export const AuthLoginGate: React.FC<AuthLoginGateProps> = ({
         {/* Corporate Identity Header */}
         <div className="px-6 pt-6 pb-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3.5">
           <img
-            src="/assets/aistudio/BA_2346ed58.png"
-            alt="Bairaq Al-Wafrah Logo"
-            className="w-12 h-12 rounded-xl object-contain shrink-0"
+            src="/icon.svg"
+            alt="Bairaq Al-Wafrah"
+            className="w-11 h-11 rounded-xl object-contain shrink-0"
           />
           <div className="min-w-0">
             <h1 className="text-base font-bold text-slate-900 dark:text-white truncate">
-              {organizationName}
+              Bairaq Al-Wafrah
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
               Enterprise Manpower Billing &amp; Statement System

@@ -36,15 +36,15 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   return (
     <div className="space-y-6">
       {/* Corporate Identity Summary Header */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-3.5">
         <img
-          src="/assets/aistudio/BA_2346ed58.png"
-          alt="Bairaq Al-Wafrah Logo"
-          className="w-12 h-12 rounded-xl object-contain shrink-0"
+          src="/icon.svg"
+          alt="Bairaq Al-Wafrah"
+          className="w-10 h-10 rounded-xl object-contain shrink-0"
         />
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">
-            Bairaq Al-Wafrah General Trading Company
+            Bairaq Al-Wafrah
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Sub-Contract Manpower Billing &amp; Statement of Accounts Overview

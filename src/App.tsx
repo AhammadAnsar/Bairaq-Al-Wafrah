@@ -131,6 +131,7 @@ function normalizeDatabase(parsed: WorkspaceDatabase): WorkspaceDatabase {
   return {
     ...INITIAL_WORKSPACE_DB,
     ...parsed,
+    organizationName: 'Bairaq Al-Wafrah',
     operatorProfile:
       parsed.operatorProfile || INITIAL_WORKSPACE_DB.operatorProfile,
     customers: parsed.customers || INITIAL_WORKSPACE_DB.customers,
@@ -894,9 +895,9 @@ export default function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <img
-                src="/assets/aistudio/BA_2346ed58.png"
-                alt="Bairaq Al-Wafrah Logo"
-                className="w-12 h-12 rounded-xl object-contain shrink-0"
+                src="/icon.svg"
+                alt="Bairaq Al-Wafrah"
+                className="w-10 h-10 rounded-xl object-contain shrink-0"
               />
               {user?.photoURL && (
                 <img
@@ -1032,7 +1033,7 @@ export default function App() {
               <Menu className="w-5 h-5" />
             </button>
             <img
-              src="/assets/aistudio/BA_2346ed58.png"
+              src="/icon.svg"
               alt="Bairaq Al-Wafrah"
               className="w-7 h-7 rounded-lg object-contain shrink-0"
             />

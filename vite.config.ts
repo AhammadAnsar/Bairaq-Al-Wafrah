@@ -12,19 +12,19 @@ export default defineConfig(() => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: [
+          'icon.svg',
           'favicon.png',
           'apple-touch-icon.png',
           'pwa-192x192.png',
           'pwa-512x512.png',
           'pwa-maskable-512x512.png',
-          'assets/aistudio/BA_2346ed58.png',
         ],
         manifest: {
           id: '/',
-          name: 'Bairaq Al-Wafrah — Manpower Billing & Statement System',
-          short_name: 'Bairaq ERP',
+          name: 'Bairaq Al-Wafrah',
+          short_name: 'Bairaq',
           description:
-            'Enterprise manpower subcontracting billing, automated statement of accounts ledger, custom company letterhead studio, and multi-device Google Drive synchronization for Bairaq Al-Wafrah General Trading Company.',
+            'Enterprise manpower subcontracting billing, automated statement of accounts ledger, and Google Drive synchronization for Bairaq Al-Wafrah.',
           theme_color: '#0f172a',
           background_color: '#0f172a',
           display: 'standalone',
@@ -50,9 +50,9 @@ export default defineConfig(() => {
               purpose: 'maskable',
             },
             {
-              src: '/assets/aistudio/BA_2346ed58.png',
-              sizes: '512x512',
-              type: 'image/png',
+              src: '/icon.svg',
+              sizes: 'any',
+              type: 'image/svg+xml',
               purpose: 'any',
             },
           ],

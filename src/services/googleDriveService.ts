@@ -1,23 +1,13 @@
-import { initializeApp, getApps } from 'firebase/app';
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-} from 'firebase/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
 import { WorkspaceDatabase } from '../types/billing';
 
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const IDENTITY_SCOPES = 'openid email profile';
 const CUSTOM_CLIENT_ID_STORAGE_KEY = 'bairaq_custom_oauth_client_id_v1';
-
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const auth = getAuth(app);
-
-// Decoupled Identity-Only Provider (NO drive.file scope attached to /__/auth/handler)
-const identityProvider = new GoogleAuthProvider();
-identityProvider.setCustomParameters({ prompt: 'select_account' });
+const DEFAULT_OAUTH_CLIENT_ID =
+  (typeof import.meta !== 'undefined' &&
+    (import.meta as unknown as { env?: Record<string, string> }).env
+      ?.VITE_GOOGLE_OAUTH_CLIENT_ID) ||
+  '754549154619-07mdmuiljeh1199vq64bpg7gek31j254.apps.googleusercontent.com';
 
 // Cache the access token in memory ONLY (never in localStorage or sessionStorage per security guidelines).
 let cachedAccessToken: string | null = null;
@@ -67,7 +57,7 @@ declare global {
 }
 
 export function getDefaultOAuthClientId(): string {
-  return firebaseConfig.oAuthClientId || '';
+  return DEFAULT_OAUTH_CLIENT_ID;
 }
 
 export function getCustomOAuthClientId(): string {
@@ -93,10 +83,6 @@ export function setCustomOAuthClientId(clientId: string): void {
 
 export function getActiveOAuthClientId(): string {
   return getCustomOAuthClientId() || getDefaultOAuthClientId();
-}
-
-export function getFirebaseRedirectHandlerUri(): string {
-  return `https://${firebaseConfig.authDomain}/__/auth/handler`;
 }
 
 async function ensureGsiClientLoaded(): Promise<boolean> {
@@ -126,21 +112,24 @@ async function ensureGsiClientLoaded(): Promise<boolean> {
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    script.onload = () => resolve(Boolean(window.google?.accounts?.oauth2?.initTokenClient));
+    script.onload = () =>
+      resolve(Boolean(window.google?.accounts?.oauth2?.initTokenClient));
     script.onerror = () => resolve(false);
     document.head.appendChild(script);
   });
 }
 
-async function fetchGoogleUserInfo(accessToken: string): Promise<GoogleUserProfile> {
+async function fetchGoogleUserInfo(
+  accessToken: string
+): Promise<GoogleUserProfile> {
   const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   if (!res.ok) {
     return {
       uid: 'google-operator',
-      displayName: 'Bairaq Al-Wafrah Operator',
-      email: 'ansarahammad369@gmail.com',
+      displayName: 'Bairaq Al-Wafrah',
+      email: null,
       photoURL: null,
     };
   }
@@ -198,7 +187,11 @@ function requestGisToken(scope: string): Promise<string> {
 
       tokenClient.requestAccessToken({ prompt: 'select_account' });
     } catch (err: any) {
-      reject(new Error(err?.message || 'Failed to initialize Google Identity Services.'));
+      reject(
+        new Error(
+          err?.message || 'Failed to initialize Google Identity Services.'
+        )
+      );
     }
   });
 }
@@ -207,67 +200,17 @@ export const initAuth = (
   onAuthSuccess?: (user: GoogleUserProfile, token?: string) => void,
   onAuthFailure?: () => void
 ) => {
-  return onAuthStateChanged(auth, async (firebaseUser) => {
-    if (cachedUserProfile) {
-      if (onAuthSuccess) onAuthSuccess(cachedUserProfile, cachedAccessToken || undefined);
-      return;
-    }
-    if (firebaseUser) {
-      const profile: GoogleUserProfile = {
-        uid: firebaseUser.uid,
-        displayName: firebaseUser.displayName,
-        email: firebaseUser.email,
-        photoURL: firebaseUser.photoURL,
-      };
-      cachedUserProfile = profile;
-      if (onAuthSuccess) onAuthSuccess(profile, cachedAccessToken || undefined);
-    } else {
-      if (onAuthFailure) onAuthFailure();
-    }
-  });
-};
-
-/**
- * STAGE 1: Decoupled Identity-Only Login (Does NOT request drive.file scope)
- * Uses Google Identity Services (GIS) with openid email profile first,
- * falling back to Firebase Identity-Only signInWithPopup without drive.file.
- */
-export const googleSignInIdentityOnly = async (): Promise<{
-  user: GoogleUserProfile;
-  accessToken: string | null;
-}> => {
-  try {
-    const token = await requestGisToken(IDENTITY_SCOPES);
-    const profile = await fetchGoogleUserInfo(token);
-    cachedUserProfile = profile;
-    return { user: profile, accessToken: null };
-  } catch (gisErr) {
-    // Fallback to Firebase Auth without drive.file scope
-    try {
-      const result = await signInWithPopup(auth, identityProvider);
-      const profile: GoogleUserProfile = {
-        uid: result.user.uid,
-        displayName: result.user.displayName,
-        email: result.user.email,
-        photoURL: result.user.photoURL,
-      };
-      cachedUserProfile = profile;
-      return { user: profile, accessToken: null };
-    } catch (fbErr: any) {
-      console.error('Decoupled Google Sign-In error:', gisErr, fbErr);
-      throw new Error(
-        fbErr?.message ||
-          (gisErr as Error)?.message ||
-          'Google Sign-In failed. Ensure this domain is added to Authorized JavaScript Origins or sign in with Operator Credentials below.'
-      );
-    }
+  if (cachedUserProfile && cachedAccessToken) {
+    if (onAuthSuccess) onAuthSuccess(cachedUserProfile, cachedAccessToken);
+  } else {
+    if (onAuthFailure) onAuthFailure();
   }
+  return () => {};
 };
 
 /**
- * STAGE 2: Dedicated Google Drive Sync Authorization via Google Identity Services (GIS) Token Flow.
- * Requests https://www.googleapis.com/auth/drive.file directly via GIS initTokenClient
- * without routing through Firebase's /__/auth/handler redirect URI.
+ * Google Drive Sync Authorization via Google Identity Services (GIS) Token Flow.
+ * Uses pure OAuth2 Token Client without any Firebase API key in the repository.
  */
 export const googleSignIn = async (): Promise<{
   user: GoogleUserProfile;
@@ -294,11 +237,6 @@ export const logoutGoogle = async () => {
   }
   cachedAccessToken = null;
   cachedUserProfile = null;
-  try {
-    await auth.signOut();
-  } catch {
-    // Ignore signout error
-  }
 };
 
 /**
@@ -352,9 +290,13 @@ export async function ensureWorkspaceFolder(token: string): Promise<string> {
 /**
  * Lists all files created by this app inside the Bairaq_Al_Wafrah_ERP folder.
  */
-export async function listWorkspaceDriveFiles(token: string): Promise<DriveFileMetadata[]> {
+export async function listWorkspaceDriveFiles(
+  token: string
+): Promise<DriveFileMetadata[]> {
   const folderId = await ensureWorkspaceFolder(token);
-  const query = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
+  const query = encodeURIComponent(
+    `'${folderId}' in parents and trashed = false`
+  );
   const res = await fetch(
     `https://www.googleapis.com/drive/v3/files?q=${query}&orderBy=modifiedTime desc&fields=files(id,name,modifiedTime,webViewLink,mimeType)`,
     {
@@ -379,7 +321,11 @@ export async function listWorkspaceDriveFiles(token: string): Promise<DriveFileM
  */
 export async function pullDatabaseFromDrive(
   token: string
-): Promise<{ db: WorkspaceDatabase; fileId: string; modifiedTime: string } | null> {
+): Promise<{
+  db: WorkspaceDatabase;
+  fileId: string;
+  modifiedTime: string;
+} | null> {
   const folderId = await ensureWorkspaceFolder(token);
   const query = encodeURIComponent(
     `name = '${DRIVE_DB_FILENAME}' and '${folderId}' in parents and trashed = false`
@@ -452,11 +398,17 @@ export async function pushDatabaseToDrive(
 
   const searchData = await searchRes.json();
   const existingFileId: string | null =
-    searchData.files && searchData.files.length > 0 ? searchData.files[0].id : null;
+    searchData.files && searchData.files.length > 0
+      ? searchData.files[0].id
+      : null;
 
   const metadata = existingFileId
     ? { name: DRIVE_DB_FILENAME, mimeType: 'application/json' }
-    : { name: DRIVE_DB_FILENAME, mimeType: 'application/json', parents: [folderId] };
+    : {
+        name: DRIVE_DB_FILENAME,
+        mimeType: 'application/json',
+        parents: [folderId],
+      };
 
   const boundary = 'bairaq_drive_multipart_boundary';
   const delimiter = `\r\n--${boundary}\r\n`;
@@ -486,7 +438,9 @@ export async function pushDatabaseToDrive(
   });
 
   if (!uploadRes.ok) {
-    throw new Error(`Failed to sync database to Google Drive (${uploadRes.status})`);
+    throw new Error(
+      `Failed to sync database to Google Drive (${uploadRes.status})`
+    );
   }
 
   const result = await uploadRes.json();
@@ -517,14 +471,19 @@ export async function uploadPdfToDrive(
   );
   const searchData = searchRes.ok ? await searchRes.json() : { files: [] };
   const existingId =
-    searchData.files && searchData.files.length > 0 ? searchData.files[0].id : null;
+    searchData.files && searchData.files.length > 0
+      ? searchData.files[0].id
+      : null;
 
   const metadata = existingId
     ? { name: fileName, mimeType: 'application/pdf' }
     : { name: fileName, mimeType: 'application/pdf', parents: [folderId] };
 
   const form = new FormData();
-  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append(
+    'metadata',
+    new Blob([JSON.stringify(metadata)], { type: 'application/json' })
+  );
   form.append('file', pdfBlob);
 
   const url = existingId
@@ -553,13 +512,19 @@ export async function uploadPdfToDrive(
 /**
  * Deletes a file from Google Drive (must ONLY be invoked after explicit user confirmation dialog).
  */
-export async function deleteDriveFile(token: string, fileId: string): Promise<void> {
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export async function deleteDriveFile(
+  token: string,
+  fileId: string
+): Promise<void> {
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   if (!res.ok && res.status !== 204) {
     throw new Error(`Failed to delete file from Google Drive (${res.status})`);

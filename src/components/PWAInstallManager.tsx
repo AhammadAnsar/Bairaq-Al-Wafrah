@@ -120,9 +120,9 @@ export const PWAInstallButton: React.FC = () => {
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
-                  src="/assets/aistudio/BA_2346ed58.png"
+                  src="/icon.svg"
                   alt="Bairaq Al-Wafrah"
-                  className="w-11 h-11 rounded-xl object-contain shrink-0"
+                  className="w-10 h-10 rounded-xl object-contain shrink-0"
                 />
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">
