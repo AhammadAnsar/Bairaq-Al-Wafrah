@@ -1,0 +1,6 @@
+{
+  "name": "Bairaq Al-Wafrah — Manpower Billing & Statement Workspace",
+  "description": "Enterprise manpower subcontracting billing, automated statement of accounts ledger, custom company letterhead studio, and real-time Google Drive synchronization for Bairaq Al-Wafrah General Trading Company.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-sans: 'Public Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-arabic: 'Cairo', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-mono-tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .font-arabic {
+    font-family: var(--font-arabic);
+  }
+}
+
+/* Official Google Sign-In Button Styling */
+.gsi-material-button {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-appearance: none;
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #747775;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #1f1f1f;
+  cursor: pointer;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 13px;
+  height: 36px;
+  letter-spacing: 0.25px;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+  transition: background-color .218s, border-color .218s, box-shadow .218s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: auto;
+  max-width: 400px;
+  min-width: min-content;
+}
+
+.gsi-material-button .gsi-material-button-icon {
+  height: 18px;
+  margin-right: 8px;
+  min-width: 18px;
+  width: 18px;
+}
+
+.gsi-material-button .gsi-material-button-content-wrapper {
+  -webkit-align-items: center;
+  align-items: center;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+
+.gsi-material-button .gsi-material-button-contents {
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.gsi-material-button:hover {
+  -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  background-color: #f8fafc;
+}
+
+/* A4 Paper Print Precision */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only-container {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .a4-scale-wrapper {
+    width: 210mm !important;
+    height: 297mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 auto !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .a4-scale-wrapper:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .a4-page-sheet {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 auto !important;
+    padding: 14mm 16mm !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: hidden !important;
+  }
+}
